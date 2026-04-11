@@ -10,10 +10,15 @@ from PIL import Image, ImageFilter, ImageEnhance
 import cv2
 import numpy as np
 
+from ImageProcessing.tile import Tile, TileRange
+# to be reworked and intedgrated into library
 
 import sys 
 import os
 
+
+
+# to do clean up group as data classes etc. 
 
 
 def get_image_array(filepath):
@@ -30,10 +35,6 @@ def get_greyscale_array(filepath):
     return cv2.cvtColor(get_image_array(filepath), cv2.COLOR_BGR2GRAY) 
 
 
-def convert_to_grey(array):
-    ''' NP array input conversion'''
-    return cv2.cvtColor(array, cv2.COLOR_BGR2GRAY) 
-
 
 def black_pixels(array, scalar=255, delta=0):
     ''' 
@@ -45,9 +46,9 @@ def black_pixels(array, scalar=255, delta=0):
 
 
 
-def group_interesting_tiles(tiles, chunksin, iteration_step):
+def group_interesting_tiles(indexes, chunksin, iteration_step):
     '''
-        takes in the Relvant Discovered Tiles, 
+        takes in the Relevant Discovered Tiles, 
         compares with the chunked original image and defines
         the x, y range of the images discovered.
     
@@ -55,7 +56,7 @@ def group_interesting_tiles(tiles, chunksin, iteration_step):
     
     groups = []
     
-    
+    #  create an object / class for this preferably data class
     group = {
         'start_x' : 0,
         'start_y' : 0,
@@ -64,12 +65,12 @@ def group_interesting_tiles(tiles, chunksin, iteration_step):
         'tile' : False
     }
 
-    
-    for tile in tiles:
+    # to do - review logic - clean up and rework.
+    for index  in indexes:
         new_group_flag = False
         tile_flag = True
-        print(tile)
-        x , y = int(chunksin[tile][1].split("_")[0])*iteration_step, int(chunksin[tile][1].split("_")[1])*iteration_step
+        # print(index)
+        x , y = int(chunksin[indexes][1].split("_")[0])*iteration_step, int(chunksin[index][1].split("_")[1])*iteration_step
         for collection in groups:
             if (collection['end_y'] == y and (x >= collection['start_x'] and x <= collection['end_x'])  ):
                 collection['end_y'] = y +iteration_step
@@ -77,10 +78,7 @@ def group_interesting_tiles(tiles, chunksin, iteration_step):
             elif (x == collection['end_x'] and y + iteration_step == collection['end_y']):
                 collection['end_x'] = x + iteration_step
                 tile_flag = False
-            # elif  (collection['end_y'] >= y +iteration_step and collection['start_y'] <= y  
-            #        and (x >= collection['start_x'] and x <= collection['end_x'])  ):
-            #     print("exists")
-            #     tile_flag = False
+
             elif  (collection['end_y'] >= y  and collection['start_y'] <= y  
                    and (x >= collection['start_x'] and x <= collection['end_x'])  ):
                 print("exists")
@@ -115,6 +113,8 @@ def group_interesting_tiles(tiles, chunksin, iteration_step):
         collection['end_y'] = collection['end_y'] + iteration_step
         collection['end_x'] = collection['end_x'] + iteration_step
     remove = []
+    
+    #  for review - look into ways to improve this logic
     for i in range(0, len(groups)):
         for ii in range(0, len(groups)):
             if groups[i]['end_y'] >= groups[ii]['start_y'] and groups[i]['start_y'] >= groups[ii]['start_y'] and groups[i]['start_y'] <= groups[ii]['end_y'] and i != ii:
@@ -133,6 +133,7 @@ def group_interesting_tiles(tiles, chunksin, iteration_step):
      
     unique = []
     
+    #  this needs to be cleaned
     for item in groups:
         try:
             if iteration_step < 100:
@@ -141,13 +142,11 @@ def group_interesting_tiles(tiles, chunksin, iteration_step):
         except:
 
             unique.append(item)
-    
-    
-    
+
     
     return  unique
                 
             
-        # cv2.imwrite(f'b_tile_pixel_{tile}_x{x}_y{y}.jpg', chunksin[tile][2])
+
         
         
