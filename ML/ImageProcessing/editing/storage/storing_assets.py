@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from ImageProcessing.mapping import get_asset_library_titles
+from ImageProcessing.editing import get_asset_library_titles
 
 import cv2
 # needs to be logically mapped to relevant folder structure

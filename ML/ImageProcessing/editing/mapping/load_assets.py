@@ -5,7 +5,8 @@ import numpy as np
 
 import cv2
 
-from ImageProcessing.mapping import get_asset_library_titles
+from ImageProcessing.editing import get_asset_library_titles
+
 
 
 
